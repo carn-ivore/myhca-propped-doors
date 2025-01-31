@@ -1,0 +1,76 @@
+// Security Coordinator's email const SECURITY_EMAIL = "security@example.com"; 
+// Elementary Principal's email const ELEMENTARY_PRINCIPAL_EMAIL = "elementary_principal@example.com";
+// Middle/High School Principal's email const MIDDLE_HIGH_PRINCIPAL_EMAIL = "middle_high_principal@example.com";
+
+// ID for spreadsheet const LOG_SHEET_ID = "example";
+
+// Code above this line is dummy content; the real content is in the AppsScript file "Propped Doors Spreadsheet" and the "OnUpdateSendEmails.gs" file
+// Code below this line can be copied
+function onSpreadsheetChange(e) {
+  try {
+    // Open the spreadsheet and get the log sheet
+    const logSheet = SpreadsheetApp.openById(LOG_SHEET_ID).getSheetByName("Form Responses 1");
+
+    // Get the last row of data in the log sheet
+    const lastRow = logSheet.getLastRow();
+    if (lastRow < 1) {
+      Logger.log("No data in the log sheet. Skipping processing.");
+      return; // Exit if the sheet is empty
+    }
+
+    // Get the data for the last row
+    const rowData = logSheet.getRange(lastRow, 1, 1, logSheet.getLastColumn()).getValues()[0];
+
+    // Map responses to known fields
+    const timestamp = rowData[0]; // Timestamp of form submission
+    const room = rowData[1]; // "Unsecured door with students present" field
+    const comments = rowData[2]; // "Anything to add?" field (comments)
+
+    // Ensure necessary data exists in the row
+    if (!timestamp || !room) {
+      Logger.log("Skipped processing: Missing required data (timestamp or room).");
+      return;
+    }
+
+    // Format timestamp for email
+    const formattedTimestamp = formatTimestamp(new Date(timestamp));
+
+    //Format timestamp for subject
+    const formattedSubjTimeStamp = formatSubjTimestamp(timestamp);
+
+    // Function to format the timestamp
+function formatSubjTimestamp(date) {
+  const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false };
+  return date.toLocaleString('en-US', options);
+}
+    //Construct the subject line
+    const subject = `Propped Door: ${room}, ${formattedSubjTimeStamp}`;
+
+    // Email body content
+    const emailBody = `The following door was found propped open or unsecure:\n\n` +
+                      `${room} on ${formattedTimestamp}\n` +
+                      `Additional comments: ${comments || "None"}`;
+
+    // Send email to Security Coordinator
+    GmailApp.sendEmail(SECURITY_EMAIL, subject, emailBody);
+    logSheet.getRange(lastRow, 4).setValue(new Date()); // Log email timestamp for Security
+
+    // Send email to Elementary Principal
+    GmailApp.sendEmail(ELEMENTARY_PRINCIPAL_EMAIL, subject, emailBody);
+    logSheet.getRange(lastRow, 5).setValue(new Date()); // Log email timestamp for Elementary Principal
+    
+    // Send email to Middle/High School Principal
+    GmailApp.sendEmail(MIDDLE_HIGH_PRINCIPAL_EMAIL, subject, emailBody);
+    logSheet.getRange(lastRow, 6).setValue(new Date()); // Log email timestamp for Middle/High School Principal
+
+    Logger.log(`Spreadsheet change processed successfully for room: ${room}`);
+  } catch (error) {
+    Logger.log(`Error in onSpreadsheetChange: ${error.message}`);
+  }
+}
+
+function formatTimestamp(timestamp) {
+  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: true };
+  return timestamp.toLocaleString("en-US", options);
+}
+
