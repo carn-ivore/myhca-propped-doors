@@ -45,6 +45,8 @@ function formatSubjTimestamp(date) {
 }
     //Construct the subject line
     const subject = `Propped Door: ${room}, ${formattedSubjTimeStamp}`;
+    const esubject = `Elem Propped Door: ${room}, ${formattedSubjTimeStamp}`; // To test success of sending to elementary
+    const mhsubject = `Mid/High Propped Door: ${room}, ${formattedSubjTimeStamp}`; // To test success of sending to middle/high
 
     // Email body content
     const emailBody = `The following door was found propped open or unsecure:\n\n` +
@@ -56,11 +58,11 @@ function formatSubjTimestamp(date) {
     logSheet.getRange(lastRow, 4).setValue(new Date()); // Log email timestamp for Security
 
     // Send email to Elementary Principal
-    GmailApp.sendEmail(ELEMENTARY_PRINCIPAL_EMAIL, subject, emailBody);
+    GmailApp.sendEmail(ELEMENTARY_PRINCIPAL_EMAIL, esubject, emailBody); // replace "esubject" with subject
     logSheet.getRange(lastRow, 5).setValue(new Date()); // Log email timestamp for Elementary Principal
     
     // Send email to Middle/High School Principal
-    GmailApp.sendEmail(MIDDLE_HIGH_PRINCIPAL_EMAIL, subject, emailBody);
+    GmailApp.sendEmail(MIDDLE_HIGH_PRINCIPAL_EMAIL, mhsubject, emailBody); // replace "mhsubject" with subject
     logSheet.getRange(lastRow, 6).setValue(new Date()); // Log email timestamp for Middle/High School Principal
 
     Logger.log(`Spreadsheet change processed successfully for room: ${room}`);
@@ -73,4 +75,3 @@ function formatTimestamp(timestamp) {
   const options = { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric", hour12: true };
   return timestamp.toLocaleString("en-US", options);
 }
-
