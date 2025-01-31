@@ -44,7 +44,7 @@ function formatSubjTimestamp(date) {
   return date.toLocaleString('en-US', options);
 }
     //Construct the subject line
-    const subject = `Propped Door: ${room}, ${formattedSubjTimeStamp}`;
+    const subject = `Unsecured Door: ${room}, ${formattedSubjTimeStamp}`;
 
     // Email body content
     const emailBody = `The following door was found propped open or unsecure:\n\n` +
