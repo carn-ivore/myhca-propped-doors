@@ -1,4 +1,4 @@
-# myhca-propped-doors
+# propped-doors
 Being able to send real-time alerts of propped doors as well as create a record of them.
 ## Description
 The Google form is used to both record that a door was found propped while students are present and to send a notification to the principals.
